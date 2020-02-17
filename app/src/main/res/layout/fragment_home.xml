@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".HomeFragment">
+
+    <Button
+        style="@style/front_page_button"
+        android:id="@+id/buttonAllBooks"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/seeBooksString"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        style="@style/front_page_button"
+        android:id="@+id/buttonAddBook"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/addBookString"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonAllBooks" />
+
+    <Button
+        style="@style/front_page_button"
+        android:id="@+id/buttonFavoriteBooks"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/favoriteBooksString"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonAddBook" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
