@@ -3,7 +3,7 @@ package no.amund.bookstore.model
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.room.Room
+import androidx.paging.DataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,23 +18,27 @@ class DatabaseRepository(context: Context?) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
-    private val DB_NAME = "book-database"
-    private var appDatabase: AppDatabase
-
-    init {
-        appDatabase = Room.databaseBuilder(context!!.applicationContext, AppDatabase::class.java, DB_NAME).build()
-    }
+    private var appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context!!)
 
     fun getAllBooks(): LiveData<List<Book>> {
-        return appDatabase.bookDao().getAll()
+        return appDatabase?.bookDao()?.getAll()!!
     }
 
     fun getFavouriteBooks(): LiveData<List<Book>> {
-        return appDatabase.bookDao().getFavouriteBooks()
+        return appDatabase?.bookDao()?.getFavouriteBooks()!!
+    }
+
+    fun getBooksPaged(): DataSource.Factory<Int, Book> {
+        return appDatabase?.bookDao()?.getAllPaged()!!
+    }
+
+    fun getFavoriteBooksPaged(): DataSource.Factory<Int, Book> {
+        return appDatabase?.bookDao()?.getFavouritesPaged()!!
     }
 
     fun addBook(title: String, author: String, description: String) {
         val book = Book(
+            id = null,
             title = title,
             author = author,
             description = description,
@@ -46,7 +50,7 @@ class DatabaseRepository(context: Context?) : CoroutineScope {
     fun addBook(book: Book) {
         launch {
             try {
-                appDatabase.bookDao().insertBook(book)
+                appDatabase?.bookDao()?.insertBook(book)
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
@@ -57,7 +61,7 @@ class DatabaseRepository(context: Context?) : CoroutineScope {
         launch {
             try {
                 Log.e(javaClass.canonicalName, book.isFavorite.toString())
-                appDatabase.bookDao().updateBook(book)
+                appDatabase?.bookDao()?.updateBook(book)
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
@@ -67,7 +71,7 @@ class DatabaseRepository(context: Context?) : CoroutineScope {
     fun deleteBook(book: Book) {
         launch {
             try {
-                appDatabase.bookDao().deleteBook(book)
+                appDatabase?.bookDao()?.deleteBook(book)
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

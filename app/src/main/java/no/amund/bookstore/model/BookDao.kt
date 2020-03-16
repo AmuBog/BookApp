@@ -1,6 +1,7 @@
 package no.amund.bookstore.model
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 
 /**
@@ -15,12 +16,18 @@ interface BookDao {
     @Query("SELECT * FROM Book WHERE isFavorite=1")
     fun getFavouriteBooks(): LiveData<List<Book>>
 
+    @Query("SELECT * FROM Book")
+    fun getAllPaged(): DataSource.Factory<Int, Book>
+
+    @Query("SELECT * FROM Book WHERE isFavorite=1")
+    fun getFavouritesPaged(): DataSource.Factory<Int, Book>
+
     @Insert
     suspend fun insertBook(vararg book: Book)
 
     @Update
-     suspend fun updateBook(vararg book: Book)
+     suspend fun updateBook(book: Book)
 
     @Delete
-     suspend fun deleteBook(vararg book: Book)
+     suspend fun deleteBook(book: Book)
 }

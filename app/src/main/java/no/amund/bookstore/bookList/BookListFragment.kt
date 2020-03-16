@@ -1,6 +1,7 @@
 package no.amund.bookstore.bookList
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +11,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_book_list.*
 import no.amund.bookstore.R
 import no.amund.bookstore.model.Book
+import java.lang.Exception
 
-class BookListFragment : Fragment(), BookListAdapter.BookAdapterInterface {
+class BookListFragment : Fragment(), BookListPagedAdapter.BookAdapterInterface {
 
-    private lateinit var bookAdapter: BookListAdapter
+    private lateinit var bookAdapter: BookListPagedAdapter
     private var isFavoriteList: Boolean = false
     private lateinit var bookListViewModel: BookListViewModel
 
@@ -30,9 +33,10 @@ class BookListFragment : Fragment(), BookListAdapter.BookAdapterInterface {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        bookAdapter = BookListAdapter(mutableListOf(), this, context)
+        //bookAdapter = BookListAdapter(mutableListOf(), this, context)
+        bookAdapter = BookListPagedAdapter(delegate = this, context = context)
 
-        startObserving(if (isFavoriteList) bookListViewModel.getFavoriteBooks() else bookListViewModel.getAllBooks())
+        subscribeUi(if (isFavoriteList) bookListViewModel.getFavoritesPaged() else bookListViewModel.getBooksPaged())
 
         return inflater.inflate(R.layout.fragment_book_list, container, false)
     }
@@ -48,10 +52,15 @@ class BookListFragment : Fragment(), BookListAdapter.BookAdapterInterface {
 
     }
 
-    private fun startObserving(liveData: LiveData<List<Book>>) {
-        liveData.observe(this, Observer {
-            if (::bookAdapter.isInitialized) {
-                bookAdapter.replaceList(it)
+    private fun subscribeUi(pagedList: LiveData<PagedList<Book>>) {
+        pagedList.observe(viewLifecycleOwner, Observer { books ->
+            if (books != null) {
+                try {
+                    Log.d(javaClass.canonicalName, books.size.toString())
+                    bookAdapter.submitList(books)
+                } catch (e: Throwable) {
+                    Log.e(javaClass.canonicalName, e.localizedMessage!!)
+                }
             }
         })
     }
@@ -61,7 +70,8 @@ class BookListFragment : Fragment(), BookListAdapter.BookAdapterInterface {
     }
 
     override fun addBook(book: Book) {
-        bookListViewModel.insertBook(book)
+        val id = bookListViewModel.insertBook(book) as Long
+        Log.d(javaClass.canonicalName, id.toString())
     }
 
     override fun removeBook(book: Book) {

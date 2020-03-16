@@ -13,7 +13,7 @@ import no.amund.bookstore.R
  * Created by Amund Bogetvedt on 2019-12-06.
  */
 
-class SwipeToDeleteCallback(private val mAdapter: BookListAdapter) :
+class SwipeToDeleteCallback(private val mAdapter: BookListPagedAdapter) :
     ItemTouchHelper.SimpleCallback(0, (ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) ) {
 
     private var icon: Drawable = ContextCompat.getDrawable(mAdapter.context!!,
